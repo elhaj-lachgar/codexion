@@ -45,29 +45,9 @@ static int	is_bournout(t_config *config)
 	{
 		last = get_last_compile(&config->coders[i]);
 		elapsed = now - last;
-		/*
-		** Burnout fires when elapsed > time_to_burnout.
-		** Exception: if the coder is actively waiting for a dongle
-		** (is_waiting=1, set at start of refactor), we allow a 10ms grace
-		** window past the deadline. This tolerates OS scheduling jitter
-		** (usleep overshooting by a few ms) without masking true burnouts.
-		**
-		** The 10ms grace matches the spec's own stated precision requirement
-		** for burnout detection ("displayed no more than 10ms after actual
-		** burnout time"), so it is a reasonable tolerance to also apply here.
-		**
-		** A truly infeasible case (e.g. burnout=599, cycle=600) will exceed
-		** time_to_burnout + 10ms and correctly fire burnout.
-		*/
 		if (elapsed > config->time_to_burnout
 			&& get_compile(config->coders + i) != config->required_compiles)
 		{
-			if (get_is_waiting(&config->coders[i])
-				&& elapsed <= config->time_to_burnout + 10)
-			{
-				++i;
-				continue ;
-			}
 			pthread_mutex_lock(&config->lock_stop);
 			config->stop_watcher = 1;
 			pthread_mutex_unlock(&config->lock_stop);

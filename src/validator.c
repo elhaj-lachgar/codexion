@@ -4,11 +4,16 @@ long	ft_atoi(char *nbr)
 {
 	long	res;
 	int		i;
-
+	int	sign;
 	res = 0;
 	i = 0;
-	if (nbr[i] == '+')
+	sign = 1;
+	if (nbr[i] == '+' || nbr[i] == '-')
+	{
+		if (nbr[i] == '-')
+			sign = -1;
 		++i;
+	}
 	while (nbr[i])
 	{
 		if (!(nbr[i] <= 57 && nbr[i] >= 48))
@@ -18,7 +23,7 @@ long	ft_atoi(char *nbr)
 			return (-1);
 		++i;
 	}
-	return (res);
+	return (res * sign);
 }
 
 char	*lower(char *shuld)

@@ -33,12 +33,6 @@ static void	take_dongle(t_dongle *dongle, t_coder *coder, int *index)
 	pthread_mutex_unlock(&dongle->locker_d);
 }
 
-/*
-** FIX: wake_mtx must be LOCKED before entering the while loop because
-** pthread_cond_wait atomically unlocks it while waiting.
-** The caller (routine) locks wake_mtx before calling take_dongles.
-** We unlock it exactly ONCE after the loop exits.
-*/
 static void	take_dongles(t_coder *coder)
 {
 	t_dongle	*first;
@@ -52,7 +46,6 @@ static void	take_dongles(t_coder *coder)
 		last = coder->f;
 		first = coder->l;
 	}
-	/* wake_mtx is already LOCKED by the caller - do NOT unlock here */
 	while (
 		!is_dongle_avaible(first)
 		|| !is_dongle_avaible(last)
@@ -67,7 +60,7 @@ static void	take_dongles(t_coder *coder)
 		}
 		pthread_cond_wait(&coder->wake_cond, &coder->wake_mtx);
 	}
-	pthread_mutex_unlock(&coder->wake_mtx); /* unlock ONCE after loop */
+	pthread_mutex_unlock(&coder->wake_mtx);
 	if (should_stop(coder->config))
 		return ;
 	index = 0;
@@ -75,11 +68,6 @@ static void	take_dongles(t_coder *coder)
 	take_dongle(last, coder, &index);
 }
 
-/*
-** FIX: broadcast on ALL coders' wake_cond, not just the releasing coder.
-** Without this, waiting coders depend on the watcher's 500µs poll to wake up,
-** causing delays that can trigger spurious burnout.
-*/
 static void	release_dongle(t_dongle *dongle, t_config *config)
 {
 	int	i;
@@ -104,7 +92,6 @@ static void	compile(t_coder *coder)
 		return ;
 	pthread_mutex_lock(&coder->lock);
 	coder->last_compile = get_time_ms();
-	coder->is_waiting = 0; /* now compiling — watcher may check deadline again */
 	pthread_mutex_unlock(&coder->lock);
 	if (!log_hanlder(coder->config, coder->id, "is compiling"))
 		return ;
@@ -160,15 +147,6 @@ void	*routine(void *arg)
 			break ;
 		if (should_stop(config))
 			break ;
-		/*
-		** Mark is_waiting=1 HERE — immediately after refactoring ends and
-		** before we touch any dongle. This closes the race window where the
-		** watcher could fire burnout between end-of-refactor and the moment
-		** req_dongle sets is_waiting. The coder is actively seeking to compile.
-		*/
-		pthread_mutex_lock(&coder->lock);
-		coder->is_waiting = 1;
-		pthread_mutex_unlock(&coder->lock);
 		coder->req_time = get_time_ms();
 		if (coder->f < coder->l)
 		{
@@ -180,8 +158,6 @@ void	*routine(void *arg)
 			req_dongle(coder->l, coder);
 			req_dongle(coder->f, coder);
 		}
-		/* FIX: lock wake_mtx HERE, before take_dongles, so cond_wait
-		** inside take_dongles receives a properly locked mutex. */
 		pthread_mutex_lock(&coder->wake_mtx);
 		take_dongles(coder);
 		if (should_stop(config))
