@@ -20,7 +20,7 @@ void	free_handler(t_config *config, int is_finish)
 		tot = config->number_coders;
 		des_coder_mtx(config, tot, tot, tot);
 		des_cond(config, 1, 1, tot);
-		des_mtx(config, 1, 1, 1, tot);
+		des_mtx(config, (t_params){1, 1, 1, 1, tot});
 	}
 	if (config->coders)
 	{
@@ -44,23 +44,25 @@ void	des_coder_mtx(t_config *config, int c_l, int c_c, int w_c)
 		pthread_mutex_destroy(&config->coders[w_c].wake_mtx);
 }
 
-void	des_mtx(t_config *config, int p, int s, int op, int d)
+void	des_mtx(t_config *config, t_params params)
 {
 	if (config->dongles)
 	{
-		while (--d >= 0)
+		while (--params.d >= 0)
 		{
-			pthread_mutex_destroy(&config->dongles[d].locker_d);
-			if (config->dongles[d].scheduler.heap)
-				free(config->dongles[d].scheduler.heap);
+			pthread_mutex_destroy(&config->dongles[params.d].locker_d);
+			if (config->dongles[params.d].scheduler.heap)
+				free(config->dongles[params.d].scheduler.heap);
 		}
 	}
-	if (p)
+	if (params.p)
 		pthread_mutex_destroy(&config->print);
-	if (s)
+	if (params.s)
 		pthread_mutex_destroy(&config->lock_stop);
-	if (op)
+	if (params.op)
 		pthread_mutex_destroy(&config->operation.op_lock);
+	if (params.t)
+		pthread_mutex_destroy(&config->time_lock);
 }
 
 void	des_cond(t_config *config, int s, int op, int d)

@@ -4,7 +4,8 @@ long	ft_atoi(char *nbr)
 {
 	long	res;
 	int		i;
-	int	sign;
+	int		sign;
+
 	res = 0;
 	i = 0;
 	sign = 1;

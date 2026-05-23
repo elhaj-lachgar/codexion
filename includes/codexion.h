@@ -12,6 +12,15 @@
 typedef struct s_config t_config;
 typedef struct s_coder t_coder;
 
+typedef struct s_params
+{
+	int t;
+	int p;
+	int s;
+	int op;
+	int d;
+}	t_params;
+
 typedef struct s_req
 {
 	t_coder		*coder;
@@ -94,7 +103,7 @@ int	log_hanlder(t_config *config, int id, char *msg);
 void	*routine(void *args);
 void	*watcher(void *args);
 int		start_coders(t_config *config);
-void	des_mtx(t_config *config, int p, int s, int op, int d);
+void	des_mtx(t_config *config, t_params params);
 void	des_cond(t_config *config, int s, int op, int d);
 int		dup_coder(t_dongle *dongle, int id);
 int		init_config(t_config *config);
@@ -106,5 +115,13 @@ long	get_last_compile(t_coder *coder);
 int is_dongle_avaible(t_dongle *dongle);
 int	get_is_waiting(t_coder *coder);
 void	des_coder_mtx(t_config *config, int c_l, int c_c, int w_c);
+void    swap(t_req *a, t_req *b);
+void    heap_down(t_dongle *dongle, int i);
+void    heap_up(t_dongle *dongle);
+void	assing_coder(t_coder *coder, t_dongle *dongles, int tot, int i);
+int	init_shuled(t_dongle *dongle, t_config *config, int i);
+int	init_operation(t_config *config);
+int	init_print(t_config *config);
+int	init_watcher(t_config *config);
 
 #endif

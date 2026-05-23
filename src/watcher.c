@@ -14,6 +14,16 @@ static void	wake_up_all(t_config *config)
 	}
 }
 
+static void	bournout_null(t_config *config)
+{
+	log_hanlder(config, config->coders[0].id, "burned out");
+	pthread_mutex_lock(&config->lock_stop);
+	config->stop_watcher = 1;
+	pthread_cond_broadcast(&config->cond_stop);
+	pthread_mutex_unlock(&config->lock_stop);
+	wake_up_all(config);
+}
+
 int	is_finish(t_config *config)
 {
 	int	i;
@@ -69,12 +79,7 @@ void	*watcher(void *args)
 		return (NULL);
 	if (!config->time_to_burnout)
 	{
-		log_hanlder(config, config->coders[0].id, "burned out");
-		pthread_mutex_lock(&config->lock_stop);
-		config->stop_watcher = 1;
-		pthread_cond_broadcast(&config->cond_stop);
-		pthread_mutex_unlock(&config->lock_stop);
-		wake_up_all(config);
+		bournout_null(config);
 		return (NULL);
 	}
 	while (1)

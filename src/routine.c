@@ -126,6 +126,7 @@ void	*routine(void *arg)
 {
 	t_coder		*coder;
 	t_config	*config;
+	int	index;
 
 	coder = (t_coder *)arg;
 	config = coder->config;
@@ -137,8 +138,8 @@ void	*routine(void *arg)
 		usleep(config->time_to_compile * 1000 / 2);
 	if (config->number_coders == 1)
 	{
-		while (!should_stop(config))
-			usleep(500);
+		index = 1;
+		take_dongle(coder->f, coder, &index);
 		return (NULL);
 	}
 	while (1)
