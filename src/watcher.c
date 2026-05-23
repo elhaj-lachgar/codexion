@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                       :::      ::::::::    */
+/*   watcher.c                                         :+:      :+:    :+:    */
+/*                                                   +:+ +:+         +:+      */
+/*   By: username <username@student.42tokyo.jp>    #+#  +:+       +#+         */
+/*                                               +#+#+#+#+#+   +#+            */
+/*   Created: 2026/05/23 17:56:15 by username         #+#    #+#              */
+/*   Updated: 2026/05/23 17:56:15 by username        ###   ########.fr        */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 static void	wake_up_all(t_config *config)
@@ -74,7 +86,7 @@ void	*watcher(void *args)
 {
 	t_config	*config;
 
-	config = (t_config *)args;
+	config = (t_config *) args;
 	if (!wait_coders(config))
 		return (NULL);
 	if (!config->time_to_burnout)

@@ -1,4 +1,26 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                       :::      ::::::::    */
+/*   init_config.c                                     :+:      :+:    :+:    */
+/*                                                   +:+ +:+         +:+      */
+/*   By: username <username@student.42tokyo.jp>    #+#  +:+       +#+         */
+/*                                               +#+#+#+#+#+   +#+            */
+/*   Created: 2026/05/23 17:55:32 by username         #+#    #+#              */
+/*   Updated: 2026/05/23 17:55:32 by username        ###   ########.fr        */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
+
+static void	set_coder_info(t_config *config, int i)
+{
+	config->coders[i].id = i + 1;
+	config->coders[i].config = config;
+	config->coders[i].last_compile = config->start;
+	config->coders[i].req_time = 0;
+	config->coders[i].compiles = 0;
+	config->coders[i].is_waiting = 0;
+}
 
 static int	helper_coders(t_coder *coder, int i)
 {
@@ -43,12 +65,7 @@ static int	init_coders(t_config *config)
 	}
 	while (i < config->number_coders)
 	{
-		config->coders[i].id = i + 1;
-		config->coders[i].config = config;
-		config->coders[i].last_compile = config->start;
-		config->coders[i].req_time = 0;
-		config->coders[i].compiles = 0;
-		config->coders[i].is_waiting = 0;
+		set_coder_info(config, i);
 		if (!helper_coders(config->coders + i, i))
 		{
 			des_mtx(config, (t_params){1, 1, 1, 1, config->number_coders});
@@ -83,9 +100,6 @@ static int	init_dongles(t_config *config)
 	}
 	while (i < config->number_coders)
 	{
-		config->dongles[i].id = i;
-		config->dongles[i].available_at = 0;
-		config->dongles[i].is_taken = 0;
 		if (!init_shuled(&config->dongles[i], config, i))
 			return (0);
 		++i;

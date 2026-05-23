@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                       :::      ::::::::    */
+/*   init_config_utils.c                               :+:      :+:    :+:    */
+/*                                                   +:+ +:+         +:+      */
+/*   By: username <username@student.42tokyo.jp>    #+#  +:+       +#+         */
+/*                                               +#+#+#+#+#+   +#+            */
+/*   Created: 2026/05/23 17:55:26 by username         #+#    #+#              */
+/*   Updated: 2026/05/23 17:55:26 by username        ###   ########.fr        */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 int	init_watcher(t_config *config)
@@ -43,6 +55,9 @@ int	init_operation(t_config *config)
 
 int	init_shuled(t_dongle *dongle, t_config *config, int i)
 {
+	config->dongles[i].id = i;
+	config->dongles[i].available_at = 0;
+	config->dongles[i].is_taken = 0;
 	if (pthread_mutex_init(&dongle->locker_d, NULL))
 	{
 		des_cond(config, 1, 1, -1);

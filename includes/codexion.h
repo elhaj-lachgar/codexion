@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   codexion.h                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: elachgar <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/05/23 18:22:04 by elachgar          #+#    #+#             */
+/*   Updated: 2026/05/23 18:36:21 by elachgar         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 #ifndef CODEXION_H
 # define CODEXION_H
 
@@ -9,16 +20,16 @@
 # include <sys/time.h>
 # include <unistd.h>
 
-typedef struct s_config t_config;
-typedef struct s_coder t_coder;
+typedef struct s_config	t_config;
+typedef struct s_coder	t_coder;
 
 typedef struct s_params
 {
-	int t;
-	int p;
-	int s;
-	int op;
-	int d;
+	int	t;
+	int	p;
+	int	s;
+	int	op;
+	int	d;
 }	t_params;
 
 typedef struct s_req
@@ -90,38 +101,47 @@ typedef struct s_config
 	t_dongle		*dongles;
 }	t_config;
 
-char	*lower(char *string);
-long	ft_atoi(char *nbr);
-int		is_valid(char **arv, int arc);
-long	get_time_ms(void);
-t_config	*set_config(char **argv);
-void	free_handler(t_config *config, int isfinish);
-void	insert(t_dongle *dongle, t_coder *coder);
-int		get_smaller(t_dongle *dongle);
-void	delete_smaller(t_dongle *dongle);
-int	log_hanlder(t_config *config, int id, char *msg);
-void	*routine(void *args);
-void	*watcher(void *args);
-int		start_coders(t_config *config);
-void	des_mtx(t_config *config, t_params params);
-void	des_cond(t_config *config, int s, int op, int d);
-int		dup_coder(t_dongle *dongle, int id);
-int		init_config(t_config *config);
-int		should_stop(t_config *config);
-int	wait_coders(t_config *config);
-int	is_finish(t_config *config);
-int	get_compile(t_coder *coder);
-long	get_last_compile(t_coder *coder);
-int is_dongle_avaible(t_dongle *dongle);
-int	get_is_waiting(t_coder *coder);
-void	des_coder_mtx(t_config *config, int c_l, int c_c, int w_c);
-void    swap(t_req *a, t_req *b);
-void    heap_down(t_dongle *dongle, int i);
-void    heap_up(t_dongle *dongle);
-void	assing_coder(t_coder *coder, t_dongle *dongles, int tot, int i);
-int	init_shuled(t_dongle *dongle, t_config *config, int i);
-int	init_operation(t_config *config);
-int	init_print(t_config *config);
-int	init_watcher(t_config *config);
+char		*lower(char *string);
+long		ft_atoi(char *nbr);
+int			is_valid(char **arv, int arc);
+long		get_time_ms(void);
+void		free_handler(t_config *config, int isfinish);
+void		insert(t_dongle *dongle, t_coder *coder);
+int			get_smaller(t_dongle *dongle);
+void		delete_smaller(t_dongle *dongle);
+int			log_hanlder(t_config *config, int id, char *msg);
+void		*routine(void *args);
+void		*watcher(void *args);
+int			start_coders(t_config *config);
+void		des_mtx(t_config *config, t_params params);
+void		des_cond(t_config *config, int s, int op, int d);
+int			dup_coder(t_dongle *dongle, int id);
+int			init_config(t_config *config);
+int			should_stop(t_config *config);
+int			wait_coders(t_config *config);
+int			is_finish(t_config *config);
+int			get_compile(t_coder *coder);
+long		get_last_compile(t_coder *coder);
+int			is_dongle_avaible(t_dongle *dongle);
+int			get_is_waiting(t_coder *coder);
+void		des_coder_mtx(t_config *config, int c_l, int c_c, int w_c);
+void		swap(t_req *a, t_req *b);
+void		heap_down(t_dongle *dongle, int i);
+void		heap_up(t_dongle *dongle);
+void		assing_coder(t_coder *coder, t_dongle *dongles, int tot, int i);
+int			init_shuled(t_dongle *dongle, t_config *config, int i);
+int			init_operation(t_config *config);
+int			init_print(t_config *config);
+int			init_watcher(t_config *config);
+int			wait_coders(t_config *config);
+void		req_dongle(t_dongle *dongle, t_coder *coder);
+void		take_dongle(t_dongle *dongle, t_coder *coder, int *index);
+void		take_dongles(t_coder *coder);
+void		assign_req(t_coder *coder);
+void		one_coder(t_coder *coder);
+void		release_dongle(t_dongle *dongle, t_config *config);
+void		assign_order(t_dongle **first, t_dongle **last, t_coder *coder);
+
+t_config	*set_config(char **arv);
 
 #endif

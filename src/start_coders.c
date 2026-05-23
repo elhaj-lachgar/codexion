@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                       :::      ::::::::    */
+/*   start_coders.c                                    :+:      :+:    :+:    */
+/*                                                   +:+ +:+         +:+      */
+/*   By: username <username@student.42tokyo.jp>    #+#  +:+       +#+         */
+/*                                               +#+#+#+#+#+   +#+            */
+/*   Created: 2026/05/23 17:55:51 by username         #+#    #+#              */
+/*   Updated: 2026/05/23 17:55:51 by username        ###   ########.fr        */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 static void	join_coders(t_config *config, int i)
@@ -25,7 +37,7 @@ static void	set_time(t_config *config)
 		pthread_mutex_unlock(&config->coders[i].c_lock);
 		++i;
 	}
-}	
+}
 
 static int	create_coders(t_config *config)
 {
@@ -39,7 +51,7 @@ static int	create_coders(t_config *config)
 			return (i);
 		++i;
 	}
-	if (pthread_create(&config->watcher, NULL, watcher, (void *)config))
+	if (pthread_create(&config->watcher, NULL, watcher, (void *) config))
 		return (i);
 	return (++i);
 }
