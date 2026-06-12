@@ -44,24 +44,18 @@ void	req_dongle(t_dongle *dongle, t_coder *coder)
 	pthread_mutex_unlock(&dongle->locker_d);
 }
 
-void	take_dongle(t_dongle *dongle, t_coder *coder, int *index)
+void	take_dongle(t_dongle *dongle, t_coder *coder)
 {
 	pthread_mutex_lock(&dongle->locker_d);
 	log_hanlder(coder->config, coder->id, "has taken a dongle");
 	dongle->is_taken = 1;
 	delete_smaller(dongle);
-	(*index)++;
 	pthread_mutex_unlock(&dongle->locker_d);
 }
 
 void	take_dongles(t_coder *coder)
 {
-	t_dongle	*first;
-	t_dongle	*last;
-	int			index;
-
-	assign_order(&first, &last, coder);
-	while (is_valid_cond(first, last, coder))
+	while (is_valid_cond(coder->f, coder->l, coder))
 	{
 		if (should_stop(coder->config))
 		{
@@ -73,7 +67,6 @@ void	take_dongles(t_coder *coder)
 	pthread_mutex_unlock(&coder->wake_mtx);
 	if (should_stop(coder->config))
 		return ;
-	index = 0;
-	take_dongle(first, coder, &index);
-	take_dongle(last, coder, &index);
+	take_dongle(coder->f, coder);
+	take_dongle(coder->l, coder);
 }

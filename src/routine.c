@@ -74,7 +74,7 @@ void	*routine(void *arg)
 		return (NULL);
 	if (config->number_coders == 1)
 	{
-		one_coder(coder);
+		take_dongle(coder->f, coder);
 		return (NULL);
 	}
 	if (coder->id % 2 == 0)

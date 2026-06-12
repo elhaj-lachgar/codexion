@@ -39,41 +39,15 @@ long	ft_atoi(char *nbr)
 	return (res * sign);
 }
 
-char	*lower(char *shuld)
-{
-	char	*lower_shuld;
-	int		i;
-
-	if (!shuld)
-		return (NULL);
-	lower_shuld = malloc(sizeof(char) * (strlen(shuld) + 1));
-	if (!lower_shuld)
-		return (NULL);
-	i = 0;
-	while (shuld[i])
-	{
-		if (shuld[i] >= 65 && shuld[i] <= 90)
-			lower_shuld[i] = shuld[i] + 32;
-		else
-			lower_shuld[i] = shuld[i];
-		++i;
-	}
-	lower_shuld[i] = 0;
-	return (lower_shuld);
-}
-
 static int	is_shuld(char *pos)
 {
-	char	*lower_shuld;
-
-	lower_shuld = lower(pos);
-	if (!lower_shuld)
+	if (!pos)
 		return (0);
-	if (!strcmp(lower_shuld, "fifo"))
-		return (free(lower_shuld), 1);
-	if (!strcmp(lower_shuld, "edf"))
-		return (free(lower_shuld), 1);
-	return (free(lower_shuld), 0);
+	if (!strcmp(pos, "fifo"))
+		return (1);
+	if (!strcmp(pos, "edf"))
+		return (1);
+	return (0);
 }
 
 int	is_valid(char **arv, int arc)

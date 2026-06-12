@@ -101,7 +101,6 @@ typedef struct s_config
 	t_dongle		*dongles;
 }	t_config;
 
-char		*lower(char *string);
 long		ft_atoi(char *nbr);
 int			is_valid(char **arv, int arc);
 long		get_time_ms(void);
@@ -135,12 +134,10 @@ int			init_print(t_config *config);
 int			init_watcher(t_config *config);
 int			wait_coders(t_config *config);
 void		req_dongle(t_dongle *dongle, t_coder *coder);
-void		take_dongle(t_dongle *dongle, t_coder *coder, int *index);
+void		take_dongle(t_dongle *dongle, t_coder *coder);
 void		take_dongles(t_coder *coder);
 void		assign_req(t_coder *coder);
-void		one_coder(t_coder *coder);
 void		release_dongle(t_dongle *dongle, t_config *config);
-void		assign_order(t_dongle **first, t_dongle **last, t_coder *coder);
 
 t_config	*set_config(char **arv);
 

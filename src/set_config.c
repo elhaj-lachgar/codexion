@@ -14,16 +14,13 @@
 
 static int	get_sheduler(char *string)
 {
-	char	*shulder_lower;
 	int		mode;
 
-	shulder_lower = lower(string);
-	if (!shulder_lower)
+	if (!string)
 		return (-1);
 	mode = 0;
-	if (!strcmp("edf", shulder_lower))
+	if (!strcmp("edf", string))
 		mode = 1;
-	free(shulder_lower);
 	return (mode);
 }
 

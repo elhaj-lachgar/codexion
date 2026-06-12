@@ -78,11 +78,22 @@ int	init_shuled(t_dongle *dongle, t_config *config, int i)
 
 void	assing_coder(t_coder *coder, t_dongle *dongles, int tot, int i)
 {
-	coder->f = &dongles[i];
-	coder->l = &dongles[(i + tot - 1) % tot];
-	if ((i + 1) % 2 == 0)
+	if ((i + 1) == 1)
 	{
-		coder->f = &dongles[(i + tot - 1) % tot];
-		coder->l = &dongles[i];
+		coder->f = &dongles[0];
+		coder->l = &dongles[tot - 1];
+	}
+	else
+	{
+		if ((i + 1) % 2 == 1)
+		{
+			coder->f = &dongles[i];
+			coder->l = &dongles[i - 1];
+		}
+		else
+		{
+			coder->f = &dongles[i - 1];
+			coder->l = &dongles[i];
+		}
 	}
 }

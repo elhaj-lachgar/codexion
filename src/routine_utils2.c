@@ -15,24 +15,8 @@
 void	assign_req(t_coder *coder)
 {
 	coder->req_time = get_time_ms();
-	if (coder->f < coder->l)
-	{
-		req_dongle(coder->f, coder);
-		req_dongle(coder->l, coder);
-	}
-	else
-	{
-		req_dongle(coder->l, coder);
-		req_dongle(coder->f, coder);
-	}
-}
-
-void	one_coder(t_coder *coder)
-{
-	int	index;
-
-	index = 1;
-	take_dongle(coder->f, coder, &index);
+	req_dongle(coder->f, coder);
+	req_dongle(coder->l, coder);
 }
 
 void	release_dongle(t_dongle *dongle, t_config *config)
@@ -50,16 +34,5 @@ void	release_dongle(t_dongle *dongle, t_config *config)
 		pthread_cond_broadcast(&config->coders[i].wake_cond);
 		pthread_mutex_unlock(&config->coders[i].wake_mtx);
 		i++;
-	}
-}
-
-void	assign_order(t_dongle **first, t_dongle **last, t_coder *coder)
-{
-	*first = coder->f;
-	*last = coder->l;
-	if (coder->l < coder->f)
-	{
-		*last = coder->f;
-		*first = coder->l;
 	}
 }
