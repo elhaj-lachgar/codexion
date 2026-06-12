@@ -55,6 +55,7 @@ void	take_dongle(t_dongle *dongle, t_coder *coder)
 
 void	take_dongles(t_coder *coder)
 {
+	pthread_mutex_lock(&coder->wake_mtx);
 	while (is_valid_cond(coder->f, coder->l, coder))
 	{
 		if (should_stop(coder->config))

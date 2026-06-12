@@ -51,7 +51,6 @@ static void	refactor(t_coder *coder)
 static int	actions(t_config *config, t_coder *coder)
 {
 	assign_req(coder);
-	pthread_mutex_lock(&coder->wake_mtx);
 	take_dongles(coder);
 	if (should_stop(config))
 		return (0);
