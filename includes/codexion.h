@@ -74,7 +74,6 @@ typedef struct s_coder
 	long			last_compile;
 	long			req_time;
 	int				compiles;
-	int				is_waiting;
 	t_dongle		*f;
 	t_dongle		*l;
 }	t_coder;
@@ -101,7 +100,7 @@ typedef struct s_config
 	t_dongle		*dongles;
 }	t_config;
 
-long		ft_atoi(char *nbr);
+long		ft_atoi(char *nbr, int *not_digit, int *overflow);
 int			is_valid(char **arv, int arc);
 long		get_time_ms(void);
 void		free_handler(t_config *config, int isfinish);
@@ -122,7 +121,6 @@ int			is_finish(t_config *config);
 int			get_compile(t_coder *coder);
 long		get_last_compile(t_coder *coder);
 int			is_dongle_avaible(t_dongle *dongle);
-int			get_is_waiting(t_coder *coder);
 void		des_coder_mtx(t_config *config, int c_l, int c_c, int w_c);
 void		swap(t_req *a, t_req *b);
 void		heap_down(t_dongle *dongle, int i);
@@ -138,7 +136,7 @@ void		take_dongle(t_dongle *dongle, t_coder *coder);
 void		take_dongles(t_coder *coder);
 void		assign_req(t_coder *coder);
 void		release_dongle(t_dongle *dongle, t_config *config);
-
+void		wake_up_all(t_config *config);
 t_config	*set_config(char **arv);
 
 #endif

@@ -12,6 +12,15 @@
 
 #include "codexion.h"
 
+static int	is_valid_equal(t_scheduler scheduler, int f, int l)
+{
+	return (scheduler.mode
+		&& scheduler.heap[f].propriete
+		== scheduler.heap[l].propriete
+		&& scheduler.heap[f].coder->id
+		< scheduler.heap[l].coder->id);
+}
+
 static int	compaire(int parent, t_scheduler *scheduler)
 {
 	int	smaller;
@@ -27,6 +36,12 @@ static int	compaire(int parent, t_scheduler *scheduler)
 	if (rigth < scheduler->size
 		&& scheduler->heap[rigth].propriete
 		< scheduler->heap[smaller].propriete)
+		smaller = rigth;
+	if (left < scheduler->size
+		&& is_valid_equal(*scheduler, left, smaller))
+		smaller = left;
+	if (rigth < scheduler->size
+		&& is_valid_equal(*scheduler, rigth, smaller))
 		smaller = rigth;
 	return (smaller);
 }
@@ -67,6 +82,9 @@ void	heap_up(t_dongle *dongle)
 		parent = (curr - 1) / 2;
 		if (dongle->scheduler.heap[parent].propriete
 			> dongle->scheduler.heap[curr].propriete)
+			swap(&dongle->scheduler.heap[curr],
+				&dongle->scheduler.heap[parent]);
+		else if (is_valid_equal(dongle->scheduler, curr, parent))
 			swap(&dongle->scheduler.heap[curr],
 				&dongle->scheduler.heap[parent]);
 		else

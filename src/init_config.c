@@ -19,7 +19,6 @@ static void	set_coder_info(t_config *config, int i)
 	config->coders[i].last_compile = config->start;
 	config->coders[i].req_time = 0;
 	config->coders[i].compiles = 0;
-	config->coders[i].is_waiting = 0;
 }
 
 static int	helper_coders(t_coder *coder, int i)
@@ -113,8 +112,18 @@ int	init_config(t_config *config)
 		return (0);
 	config->start = get_time_ms();
 	if (!init_dongles(config))
-		return (free_handler(config, 0), 0);
+	{
+		printf("fail to init dongles\n");
+		free_handler(config, 0);
+		free(config);
+		return (0);
+	}
 	if (!init_coders(config))
-		return (free_handler(config, 0), 0);
+	{
+		printf("fail to init coders\n");
+		free_handler(config, 0);
+		free(config);
+		return (0);
+	}
 	return (1);
 }

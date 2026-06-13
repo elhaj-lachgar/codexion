@@ -21,18 +21,10 @@ void	assign_req(t_coder *coder)
 
 void	release_dongle(t_dongle *dongle, t_config *config)
 {
-	int	i;
-
 	pthread_mutex_lock(&dongle->locker_d);
 	dongle->is_taken = 0;
 	dongle->available_at = get_time_ms() + config->dongle_cooldown;
 	pthread_mutex_unlock(&dongle->locker_d);
-	i = 0;
-	while (i < config->number_coders)
-	{
-		pthread_mutex_lock(&config->coders[i].wake_mtx);
-		pthread_cond_broadcast(&config->coders[i].wake_cond);
-		pthread_mutex_unlock(&config->coders[i].wake_mtx);
-		i++;
-	}
+	if (!config->dongle_cooldown)
+		wake_up_all(config);
 }

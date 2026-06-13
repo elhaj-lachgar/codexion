@@ -12,7 +12,23 @@
 
 #include "codexion.h"
 
-long	ft_atoi(char *nbr)
+static int	is_error(int *error)
+{
+	*error = 1;
+	return (-1);
+}
+
+static void	error_logs(int *err_digit, int *err_overflow)
+{
+	if (*err_digit)
+		printf("The Arguments must be integer\n");
+	else if (*err_overflow)
+		printf("The Arguments overflow\n");
+	else
+		printf("The Argument is Negative Value\n");
+}
+
+long	ft_atoi(char *nbr, int *not_digit, int *overflow)
 {
 	long	res;
 	int		i;
@@ -30,10 +46,11 @@ long	ft_atoi(char *nbr)
 	while (nbr[i])
 	{
 		if (!(nbr[i] <= 57 && nbr[i] >= 48))
-			return (-1);
+			return (is_error(not_digit));
 		res = res * 10 + nbr[i] - 48;
-		if (res > INT_MAX)
-			return (-1);
+		if ((sign == 1 && res > INT_MAX)
+			|| (sign == -1 && res - 1 > INT_MAX))
+			return (is_error(overflow));
 		++i;
 	}
 	return (res * sign);
@@ -47,23 +64,32 @@ static int	is_shuld(char *pos)
 		return (1);
 	if (!strcmp(pos, "edf"))
 		return (1);
+	printf("scheduler Must equal fifo or edf\n");
 	return (0);
 }
 
 int	is_valid(char **arv, int arc)
 {
 	int	i;
+	int	not_digit;
+	int	overflow;
 
 	i = 0;
 	if (arc != 8)
+	{
+		printf("ERROR: lenght of arguments must be 8\n");
 		return (0);
+	}
+	not_digit = 0;
+	overflow = 0;
 	while (i < 6)
 	{
-		if (ft_atoi(arv[i]) < 0)
+		if (ft_atoi(arv[i], &not_digit, &overflow) < 0)
+		{
+			error_logs(&not_digit, &overflow);
 			return (0);
+		}
 		++i;
 	}
-	if (ft_atoi(arv[0]) <= 0 || ft_atoi(arv[5]) <= 0)
-		return (0);
 	return (is_shuld(arv[7]));
 }

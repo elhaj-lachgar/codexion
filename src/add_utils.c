@@ -22,13 +22,3 @@ int	is_dongle_avaible(t_dongle *dongle)
 	pthread_mutex_unlock(&dongle->locker_d);
 	return (is_av);
 }
-
-int	get_is_waiting(t_coder *coder)
-{
-	int	waiting;
-
-	pthread_mutex_lock(&coder->lock);
-	waiting = coder->is_waiting;
-	pthread_mutex_unlock(&coder->lock);
-	return (waiting);
-}

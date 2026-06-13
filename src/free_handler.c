@@ -37,7 +37,7 @@ void	free_handler(t_config *config, int is_finish)
 void	des_coder_mtx(t_config *config, int c_l, int c_c, int w_c)
 {
 	while (--c_l >= 0)
-		pthread_mutex_destroy(&config->coders[c_l].c_lock);
+		pthread_mutex_destroy(&config->coders[c_l].lock);
 	while (--c_c >= 0)
 		pthread_mutex_destroy(&config->coders[c_c].c_lock);
 	while (--w_c >= 0)

@@ -42,9 +42,6 @@ static void	refactor(t_coder *coder)
 		return ;
 	if (!log_hanlder(coder->config, coder->id, "is refactoring"))
 		return ;
-	pthread_mutex_lock(&coder->lock);
-	coder->is_waiting = 1;
-	pthread_mutex_unlock(&coder->lock);
 	usleep(coder->config->time_to_refactor * 1000);
 }
 
