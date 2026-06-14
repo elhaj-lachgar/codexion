@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by [elachgar].*
+*This project has been created as part of the 42 curriculum by elachgar.*
 
 ---
 
@@ -49,13 +49,13 @@ make re       # full rebuild
 
 | Argument | Type | Description |
 |---|---|---|
-| `number_of_coders` | int ≥ 1 | Number of coder threads |
-| `time_to_burnout` | int ≥ 0 | Max ms a coder can go without compiling (0 = instant burnout) |
-| `time_to_compile` | int ≥ 0 | Duration of a compile in milliseconds |
-| `time_to_debug` | int ≥ 0 | Duration of a debug session in milliseconds |
-| `time_to_refactor` | int ≥ 0 | Duration of a refactor session in milliseconds |
-| `required_compiles` | int ≥ 1 | Number of compiles each coder must complete |
-| `dongle_cooldown` | int ≥ 0 | Ms a dongle must rest after being released |
+| `number_of_coders` | int  | Number of coder threads |
+| `time_to_burnout` | int  | Max ms a coder can go without compiling (0 = instant burnout) |
+| `time_to_compile` | int  | Duration of a compile in milliseconds |
+| `time_to_debug` | int  | Duration of a debug session in milliseconds |
+| `time_to_refactor` | int  | Duration of a refactor session in milliseconds |
+| `required_compiles` | int  | Number of compiles each coder must complete |
+| `dongle_cooldown` | int  | Ms a dongle must rest after being released |
 | `scheduler` | string | Dongle acquisition policy: `fifo` or `edf` (case-sensitive) |
 
 All integer arguments are validated with overflow and non-digit detection. The scheduler argument must be exactly `fifo` or `edf` — descriptive error messages are printed on invalid input.
@@ -105,7 +105,6 @@ Two scheduling modes are supported:
 
 A tie-breaking rule is applied in EDF mode via `is_valid_equal`: when two coders share the same deadline, the one with the lower ID wins, making priority fully deterministic and preventing livelock between equally-urgent coders.
 
-`dup_coder` prevents double-insertion: a coder that re-enters the request loop after being woken will not be added to a heap it already occupies.
 
 ### Cooldown Handling
 
@@ -198,8 +197,7 @@ The `t_scheduler` inside each `t_dongle` is a min-heap serving as a thread-safe 
 ```c
 // Register interest (routine_utils2.c — assign_req → req_dongle):
 pthread_mutex_lock(&dongle->locker_d);
-if (!dup_coder(dongle, coder->id))
-    insert(dongle, coder);
+insert(dongle, coder);
 pthread_mutex_unlock(&dongle->locker_d);
 
 // Only proceed when at position 0 in both heaps (routine_utils1.c — is_valid_cond):
