@@ -34,8 +34,8 @@ make
 ```
 
 Produces the `codexion` executable. Additional targets:
-
 ```bash
+make all      # complie project
 make clean    # remove object files
 make fclean   # remove objects and binary
 make re       # full rebuild
@@ -81,10 +81,10 @@ All integer arguments are validated with overflow and non-digit detection. The s
 Each log line follows the format:
 
 ```
-<timestamp_ms> <coder_id> <state>
+<timestamp_ms> <coder_id> <message>
 ```
 
-Possible states: `has taken a dongle`, `is compiling`, `is debuging`, `is refactoring`, `burned out`.
+Possible messages: `has taken a dongle`, `is compiling`, `is debuging`, `is refactoring`, `burned out`.
 
 ---
 
@@ -92,7 +92,7 @@ Possible states: `has taken a dongle`, `is compiling`, `is debuging`, `is refact
 
 ### Deadlock Prevention — Coffman's Conditions
 
-The classical deadlock scenario in a resource-ring topology (circular wait, one of Coffman's four necessary conditions) is eliminated by enforcing a **consistent global dongle acquisition order** inside `take_dongles`. Both dongles are always registered and acquired by the coder itself in the order `f` then `l` as assigned, where odd-numbered coders hold `f < l` and even-numbered coders hold `f > l` — breaking any possible cycle. The condition check before sleeping is also atomic under the coder's own `wake_mtx`, preventing a coder from grabbing a dongle that another has already claimed.
+The classical deadlock scenario in a resource-ring topology (circular wait, one of Coffman's four necessary conditions) is eliminated by enforcing a **consistent global dongle acquisition order** inside `take_dongles`. Both dongles are always registered and acquired by the coder itself in the order `f` then `l` as assigned, where odd-numbered coders hold `f > l` and even-numbered coders hold `f < l` — breaking any possible cycle. The condition check before sleeping is also atomic under the coder's own `wake_mtx`, preventing a coder from grabbing a dongle that another has already claimed.
 
 ### Starvation Prevention — Priority Scheduler (FIFO / EDF)
 
@@ -166,7 +166,11 @@ Three condition variables implement event-driven blocking, eliminating all busy-
 pthread_mutex_lock(&coder->wake_mtx);
 while (is_valid_cond(coder->f, coder->l, coder))
 {
-    if (should_stop(coder->config)) { ... return; }
+    if (should_stop(coder->config))
+		{
+			pthread_mutex_unlock(&coder->wake_mtx);
+			return ;
+		}
     pthread_cond_wait(&coder->wake_cond, &coder->wake_mtx);
 }
 pthread_mutex_unlock(&coder->wake_mtx);

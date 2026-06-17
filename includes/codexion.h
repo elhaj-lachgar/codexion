@@ -113,7 +113,6 @@ void		*watcher(void *args);
 int			start_coders(t_config *config);
 void		des_mtx(t_config *config, t_params params);
 void		des_cond(t_config *config, int s, int op, int d);
-int			dup_coder(t_dongle *dongle, int id);
 int			init_config(t_config *config);
 int			should_stop(t_config *config);
 int			wait_coders(t_config *config);

@@ -39,8 +39,7 @@ int	wait_coders(t_config *config)
 void	req_dongle(t_dongle *dongle, t_coder *coder)
 {
 	pthread_mutex_lock(&dongle->locker_d);
-	if (!dup_coder(dongle, coder->id))
-		insert(dongle, coder);
+	insert(dongle, coder);
 	pthread_mutex_unlock(&dongle->locker_d);
 }
 

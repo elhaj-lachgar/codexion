@@ -49,17 +49,3 @@ void	delete_smaller(t_dongle *dongle)
 	dongle->scheduler.size--;
 	heap_down(dongle, 0);
 }
-
-int	dup_coder(t_dongle *dongle, int id)
-{
-	int	i;
-
-	i = 0;
-	while (i < dongle->scheduler.size)
-	{
-		if (dongle->scheduler.heap[i].coder->id == id)
-			return (1);
-		++i;
-	}
-	return (0);
-}
