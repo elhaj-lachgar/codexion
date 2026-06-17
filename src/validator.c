@@ -82,7 +82,7 @@ int	is_valid(char **arv, int arc)
 	}
 	not_digit = 0;
 	overflow = 0;
-	while (i < 6)
+	while (i < 7)
 	{
 		if (ft_atoi(arv[i], &not_digit, &overflow) < 0)
 		{
