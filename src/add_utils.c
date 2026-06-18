@@ -22,3 +22,16 @@ int	is_dongle_avaible(t_dongle *dongle)
 	pthread_mutex_unlock(&dongle->locker_d);
 	return (is_av);
 }
+
+void	my_sleep(long time, t_config *config)
+{
+	long	curr;
+
+	curr = get_time_ms();
+	while (get_time_ms() - curr < time)
+	{
+		if (should_stop(config))
+			break ;
+		usleep(500);
+	}
+}

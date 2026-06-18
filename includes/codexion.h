@@ -136,6 +136,7 @@ void		take_dongles(t_coder *coder);
 void		assign_req(t_coder *coder);
 void		release_dongle(t_dongle *dongle, t_config *config);
 void		wake_up_all(t_config *config);
+void		my_sleep(long time, t_config *config);
 t_config	*set_config(char **arv);
 
 #endif
