@@ -19,14 +19,12 @@ static void	compile(t_coder *coder)
 	config = coder->config;
 	if (should_stop(config))
 		return ;
-	pthread_mutex_lock(&coder->lock);
-	coder->last_compile = get_time_ms();
-	pthread_mutex_unlock(&coder->lock);
 	if (!log_hanlder(coder->config, coder->id, "is compiling"))
 		return ;
 	my_sleep(config->time_to_compile, config);
-	if (should_stop(config))
-		return ;
+	pthread_mutex_lock(&coder->lock);
+	coder->last_compile = get_time_ms();
+	pthread_mutex_unlock(&coder->lock);
 	pthread_mutex_lock(&coder->c_lock);
 	coder->compiles++;
 	pthread_mutex_unlock(&coder->c_lock);

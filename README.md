@@ -91,10 +91,42 @@ Possible messages: `has taken a dongle`, `is compiling`, `is debuging`, `is refa
 ## Blocking Cases Handled
 
 ### Deadlock Prevention — Coffman's Conditions
-
+by assign dongles that prevent from cycler by change order if coder id odd that mean ``coder->f > coder->l`` else ``coder->l > coder->f`` by function ``assign_coder``
+```bash
+void	assing_coder(t_coder *coder, t_dongle *dongles, int tot, int i)
+{
+	if ((i + 1) == 1)
+	{
+		coder->f = &dongles[0];
+		coder->l = &dongles[tot - 1];
+	}
+	else
+	{
+		if ((i + 1) % 2 == 1)
+		{
+			coder->f = &dongles[i];
+			coder->l = &dongles[i - 1];
+		}
+		else
+		{
+			coder->f = &dongles[i - 1];
+			coder->l = &dongles[i];
+		}
+	}
+}
+```
 
 ### Starvation Prevention — Priority Scheduler (FIFO / EDF)
 
+
+Each dongle maintains a **min-heap priority queue** of waiting coders (`t_scheduler` inside `t_dongle`). A coder registers itself in both heaps via `req_dongle` before sleeping. It may only proceed once it is at position 0 in **both** heaps simultaneously (`get_smaller` checks), guaranteeing no coder is indefinitely bypassed.
+
+Two scheduling modes are supported:
+
+- **FIFO** — priority is the coder's `req_time` (request timestamp). Coders are served in strict arrival order, bounding wait time to a fixed queue depth.
+- **EDF (Earliest Deadline First)** — priority is `last_compile + time_to_burnout`. The coder whose deadline is nearest is served first, minimising burnout risk under contention.
+
+A tie-breaking rule is applied in EDF mode via `is_valid_equal`: when two coders share the same deadline, the one with the lower ID wins, making priority fully deterministic and preventing livelock between equally-urgent coders.
 
 ### Cooldown Handling
 handle by attribute in ``t_dongle`` struct set every realse dongle 

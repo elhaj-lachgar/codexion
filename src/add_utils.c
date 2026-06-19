@@ -27,6 +27,8 @@ void	my_sleep(long time, t_config *config)
 {
 	long	curr;
 
+	if (time < 10)
+		time += 10;
 	curr = get_time_ms();
 	while (get_time_ms() - curr < time)
 	{
