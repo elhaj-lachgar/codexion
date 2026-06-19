@@ -6,7 +6,7 @@
 
 ## Description
 
-Codexion is a multithreaded simulation of the classic dining philosophers problem, reimagined in a developer context. A set of **coders** sit around a table, each needing two **USB dongles** (shared with adjacent coders) to compile their code. Each coder alternates between compiling, debugging, and refactoring. If a coder goes too long without compiling, they **burn out** and the simulation ends. The goal is to orchestrate shared resource access across concurrent threads with no deadlocks, no starvation, and precise burnout detection.
+Codexion is a multithreaded problem, reimagined in a developer context. A set of **coders** sit around a table, each needing two **USB dongles** (shared with adjacent coders) to compile their code. Each coder alternates between compiling, debugging, and refactoring. If a coder goes too long without compiling, they **burn out** and the simulation ends. The goal is to orchestrate shared resource access across concurrent threads with no deadlocks, no starvation, and precise burnout detection.
 
 The project exercises core concepts of concurrent programming in C using POSIX threads: mutual exclusion, condition variables, priority scheduling, and careful memory lifecycle management.
 
@@ -22,7 +22,7 @@ The project exercises core concepts of concurrent programming in C using POSIX t
 
 ### Requirements
 
-- GCC or compatible C compiler
+- CC
 - POSIX threads support (`-pthread`)
 - GNU Make
 - Linux or macOS
@@ -35,7 +35,7 @@ make
 
 Produces the `codexion` executable. Additional targets:
 ```bash
-make all      # complie project
+make all      # compile project
 make clean    # remove object files
 make fclean   # remove objects and binary
 make re       # full rebuild
@@ -58,7 +58,7 @@ make re       # full rebuild
 | `dongle_cooldown` | int  | Ms a dongle must rest after being released |
 | `scheduler` | string | Dongle acquisition policy: `fifo` or `edf` (case-sensitive) |
 
-All integer arguments are validated with overflow and non-digit detection. The scheduler argument must be exactly `fifo` or `edf` — descriptive error messages are printed on invalid input.
+All integer arguments are validated with overflow and non-digit detection and negative value. The scheduler argument must be exactly `fifo` or `edf` — descriptive error messages are printed on invalid input.
 
 ### Examples
 
@@ -92,48 +92,52 @@ Possible messages: `has taken a dongle`, `is compiling`, `is debuging`, `is refa
 
 ### Deadlock Prevention — Coffman's Conditions
 
-The classical deadlock scenario in a resource-ring topology (circular wait, one of Coffman's four necessary conditions) is eliminated by enforcing a **consistent global dongle acquisition order** inside `take_dongles`. Both dongles are always registered and acquired by the coder itself in the order `f` then `l` as assigned, where odd-numbered coders hold `f > l` and even-numbered coders hold `f < l` — breaking any possible cycle. The condition check before sleeping is also atomic under the coder's own `wake_mtx`, preventing a coder from grabbing a dongle that another has already claimed.
 
 ### Starvation Prevention — Priority Scheduler (FIFO / EDF)
 
-Each dongle maintains a **min-heap priority queue** of waiting coders (`t_scheduler` inside `t_dongle`). A coder registers itself in both heaps via `req_dongle` before sleeping. It may only proceed once it is at position 0 in **both** heaps simultaneously (`get_smaller` checks), guaranteeing no coder is indefinitely bypassed.
-
-Two scheduling modes are supported:
-
-- **FIFO** — priority is the coder's `req_time` (request timestamp). Coders are served in strict arrival order, bounding wait time to a fixed queue depth.
-- **EDF (Earliest Deadline First)** — priority is `last_compile + time_to_burnout`. The coder whose deadline is nearest is served first, minimising burnout risk under contention.
-
-A tie-breaking rule is applied in EDF mode via `is_valid_equal`: when two coders share the same deadline, the one with the lower ID wins, making priority fully deterministic and preventing livelock between equally-urgent coders.
-
 
 ### Cooldown Handling
-
-After a dongle is released in `release_dongle`, it enters a cooldown period:
-
-```c
+handle by attribute in ``t_dongle`` struct set every realse dongle 
+```bash
 dongle->available_at = get_time_ms() + config->dongle_cooldown;
 ```
+than in step of taking dongle, i check if time available_at had pass or not:
 
-`is_dongle_avaible` reads both `available_at` and `is_taken` atomically under `locker_d`, closing any TOCTOU window between availability check and acquisition. When `dongle_cooldown` is zero, `wake_up_all` is called immediately after release to avoid any unnecessary sleep cycles.
+```bash
+static int	is_valid_cond(t_dongle *first, t_dongle *last, t_coder *coder)
+{
+	return (
+		!is_dongle_avaible(first)
+		|| !is_dongle_avaible(last)
+		|| get_smaller(first) != coder->id
+		|| get_smaller(last) != coder->id);
+}
+
+# check inside take dongles 
+while (is_valid_cond(coder->f, coder->l, coder))
+	...;
+```
 
 ### Precise Burnout Detection
+add thread run ``watcher`` function that had infinte loop and just break from the loop if is finish compile all coders or coder had bournout by two functions ``is_finish`` ``is_bournout``, function ``is_bournout`` check if coder had bournout by loop over all coder and check by this comparaison :
 
-The watcher thread polls every 500 µs and compares each coder's `last_compile` (read under `coder->lock`) against the current wall-clock time. To guarantee that `burned out` is the last line printed even if other threads are mid-log, the watcher sets `stop_watcher = 1` under `lock_stop` before calling `log_hanlder`. Inside `log_hanlder`, `should_stop` is checked while holding `config->print`, so no compile/debug message from another thread can appear after the burnout line.
+```
+last = get_last_compile(&config->coders[i]);
+elapsed = now - last;
+if (elapsed > config->time_to_burnout
+	&& get_compile(config->coders + i) != config->required_compiles)
+```
 
 ### Edge Case: Zero Burnout Time
+create custome function check if time bournout equal 0 then set stop value to 1 and wake up all coders to stop excution  ``bournout_null``
 
-When `time_to_burnout == 0`, the watcher immediately calls `bournout_null`: it logs burnout for coder 1, sets `stop_watcher`, broadcasts on `cond_stop`, and wakes all coders — before any compile cycle begins. Each coder also short-circuits at `!config->time_to_burnout` right after the startup barrier, returning immediately.
 
 ### Edge Case: Single Coder
-
-With one coder there is only one dongle but the coder needs two. The deadlock is detected early: `number_coders == 1` routes directly to `take_dongle(coder->f, coder)`, which acquires the one dongle and blocks indefinitely — the watcher detects burnout and terminates the simulation without entering the normal loop.
-
----
+handle by condition in ``routine`` that check if number coders == 1 , than take coder take dongle and wait for bournout. 
 
 ## Thread Synchronization Mechanisms
 
 ### `pthread_mutex_t` — Mutual Exclusion
-
 Every piece of shared state is protected by a dedicated mutex:
 
 | Mutex | File | Protected data |
@@ -147,16 +151,7 @@ Every piece of shared state is protected by a dedicated mutex:
 | `config->time_lock` | `utils.c` | `config->start` timestamp |
 | `config->operation.op_lock` | `routine_utils1.c` | startup barrier state |
 
-Example — race-free compile counter increment:
-
-```c
-pthread_mutex_lock(&coder->c_lock);
-coder->compiles++;
-pthread_mutex_unlock(&coder->c_lock);
-```
-
 ### `pthread_cond_t` — Condition Variables
-
 Three condition variables implement event-driven blocking, eliminating all busy-wait loops:
 
 **`coder->wake_cond` / `coder->wake_mtx`** — each coder sleeps here while waiting for its two dongles to become free and for itself to be first in both heaps. Any thread releasing a dongle calls `wake_up_all`, which broadcasts to every coder:
@@ -193,9 +188,7 @@ config->operation.op_coders = i;           // records how many threads were crea
 config->start = get_time_ms();             // single authoritative start time
 pthread_cond_broadcast(&config->operation.op_cond);
 ```
-
 ### Per-dongle Heap as a Synchronized Priority Queue
-
 The `t_scheduler` inside each `t_dongle` is a min-heap serving as a thread-safe wait queue. All reads and writes are done under `dongle->locker_d`. A coder checks the heap top before acquiring:
 
 ```c
@@ -212,21 +205,20 @@ This guarantees at most one coder per dongle believes it is next at any point in
 
 In EDF mode the heap also applies tie-breaking by coder ID (`is_valid_equal` in `heap_utils.c`), making the priority order fully deterministic even when two coders share the same deadline.
 
-### How Race Conditions Are Prevented
 
+### How Race Conditions Are Prevented
 - **Log serialisation:** `config->print` mutex wraps every `printf` in `log_hanlder`. The `should_stop` check is performed while holding this mutex, so `burned out` is atomically the last line printed — no compile/refactor message can interleave with or follow it.
 - **Time reads:** `get_last_compile` and `start_time` always lock their respective mutexes before reading, preventing torn reads on 64-bit `long` values.
 - **Dongle availability:** `is_dongle_avaible` reads `available_at` and `is_taken` in the same critical section under `locker_d`, preventing a TOCTOU race between the check and the acquisition performed in `take_dongle`.
-- **Even/odd stagger:** Even-numbered coders sleep for half a compile duration before entering their loop (`usleep(config->time_to_compile * 1000 / 2)`). This initial desynchronisation reduces contention at startup without affecting correctness or timing guarantees.
+- **Even/odd stagger:** Even-numbered coders sleep for half a compile duration before entering their loop (`my_sleep(config->time_to_compile / 2)`). This initial desynchronisation reduces contention at startup without affecting correctness or timing guarantees.
 - **Cooldown optimisation:** `release_dongle` only calls `wake_up_all` when `dongle_cooldown` is zero, avoiding redundant broadcasts when released dongles are temporarily unavailable anyway.
 
----
 
 ## Resources
 
 ### POSIX Threads & Concurrency
 
-- [Multithreading in CL](https://www.geeksforgeeks.org/c/multithreading-in-c/)
+- [Multithreading in CL](https://www.geek We use it to make a thread sleep efficiently until a specific condition or event occursforgeeks.org/c/multithreading-in-c/)
 - [Thread Management Functions in C](https://www.geeksforgeeks.org/c/thread-functions-in-c-c/)
 
 ### Deadlock & Scheduling Theory
