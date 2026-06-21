@@ -33,7 +33,7 @@ static void	set_time(t_config *config)
 	while (i < config->number_coders)
 	{
 		pthread_mutex_lock(&config->coders[i].c_lock);
-		config->coders[i].last_compile = get_time_ms();
+		config->coders[i].last_compile = config->start;
 		pthread_mutex_unlock(&config->coders[i].c_lock);
 		++i;
 	}

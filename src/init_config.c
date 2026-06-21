@@ -110,7 +110,6 @@ int	init_config(t_config *config)
 {
 	if (!config)
 		return (0);
-	config->start = get_time_ms();
 	if (!init_dongles(config))
 	{
 		printf("fail to init dongles\n");

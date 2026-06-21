@@ -130,13 +130,15 @@ int			init_operation(t_config *config);
 int			init_print(t_config *config);
 int			init_watcher(t_config *config);
 int			wait_coders(t_config *config);
+int			add_validator(int arc);
+int			add_validator1(int index, int value);
 void		req_dongle(t_dongle *dongle, t_coder *coder);
 void		take_dongle(t_dongle *dongle, t_coder *coder);
 void		take_dongles(t_coder *coder);
 void		assign_req(t_coder *coder);
 void		release_dongle(t_dongle *dongle, t_config *config);
 void		wake_up_all(t_config *config);
-void		my_sleep(long time, t_config *config);
+void		my_sleep(long time, t_config *config, int add);
 t_config	*set_config(char **arv);
 
 #endif

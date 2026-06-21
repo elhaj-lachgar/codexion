@@ -21,7 +21,7 @@ static void	compile(t_coder *coder)
 		return ;
 	if (!log_hanlder(coder->config, coder->id, "is compiling"))
 		return ;
-	my_sleep(config->time_to_compile, config);
+	my_sleep(config->time_to_compile, config, 1);
 	pthread_mutex_lock(&coder->lock);
 	coder->last_compile = get_time_ms();
 	pthread_mutex_unlock(&coder->lock);
@@ -39,7 +39,7 @@ static void	debug(t_coder *coder)
 		return ;
 	if (!log_hanlder(coder->config, coder->id, "is debuging"))
 		return ;
-	my_sleep(config->time_to_debug, config);
+	my_sleep(config->time_to_debug, config, 0);
 }
 
 static void	refactor(t_coder *coder)
@@ -51,7 +51,7 @@ static void	refactor(t_coder *coder)
 		return ;
 	if (!log_hanlder(coder->config, coder->id, "is refactoring"))
 		return ;
-	my_sleep(config->time_to_refactor, config);
+	my_sleep(config->time_to_refactor, config, 0);
 }
 
 static int	actions(t_config *config, t_coder *coder)
@@ -83,7 +83,7 @@ void	*routine(void *arg)
 		return (NULL);
 	}
 	if (coder->id % 2 == 0)
-		my_sleep((config->time_to_compile / 2), config);
+		my_sleep(config->time_to_compile / 2, config, 1);
 	while (1)
 	{
 		if (get_compile(coder) == config->required_compiles

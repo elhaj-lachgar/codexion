@@ -47,8 +47,8 @@ void	take_dongle(t_dongle *dongle, t_coder *coder)
 {
 	pthread_mutex_lock(&dongle->locker_d);
 	log_hanlder(coder->config, coder->id, "has taken a dongle");
-	dongle->is_taken = 1;
 	delete_smaller(dongle);
+	dongle->is_taken = 1;
 	pthread_mutex_unlock(&dongle->locker_d);
 }
 

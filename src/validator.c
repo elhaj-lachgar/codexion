@@ -75,11 +75,8 @@ int	is_valid(char **arv, int arc)
 	int	overflow;
 
 	i = 0;
-	if (arc != 8)
-	{
-		printf("ERROR: lenght of arguments must be 8\n");
+	if (!add_validator(arc))
 		return (0);
-	}
 	not_digit = 0;
 	overflow = 0;
 	while (i < 7)
@@ -89,6 +86,8 @@ int	is_valid(char **arv, int arc)
 			error_logs(&not_digit, &overflow);
 			return (0);
 		}
+		if (!add_validator1(i, ft_atoi(arv[i], &not_digit, &overflow)))
+			return (0);
 		++i;
 	}
 	return (is_shuld(arv[7]));
