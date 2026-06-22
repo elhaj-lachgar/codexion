@@ -24,8 +24,7 @@ The project exercises core concepts of concurrent programming in C using POSIX t
 
 - CC
 - POSIX threads support (`-pthread`)
-- GNU Make
-- Linux or macOS
+- Make
 
 ### Compilation
 
@@ -63,17 +62,7 @@ All integer arguments are validated with overflow and non-digit detection and ne
 ### Examples
 
 ```bash
-# 5 coders, 800ms burnout, 200ms compile, 100ms debug, 100ms refactor, 7 compiles, no cooldown, FIFO
 ./codexion 5 800 200 100 100 7 0 fifo
-
-# Same but with EDF scheduling and a 50ms cooldown
-./codexion 5 800 200 100 100 7 50 edf
-
-# Edge case: single coder (acquires one dongle, then blocks and burns out)
-./codexion 1 400 200 100 100 3 0 fifo
-
-# Zero burnout — all coders burn out immediately at start
-./codexion 5 0 200 100 100 7 0 fifo
 ```
 
 ### Output format
@@ -208,7 +197,7 @@ pthread_cond_broadcast(&config->coders[i].wake_cond);
 
 **`config->cond_stop` / `config->lock_stop`** — signals all threads that the simulation has ended (burnout or completion detected by the watcher).
 
-**`config->operation.op_cond` / `config->operation.op_lock`** — implements the **startup barrier**. Every coder thread and the watcher call `wait_coders` and block here until `start_coders` has spawned every thread, recorded the precise start timestamp, and broadcast the signal. This ensures all threads start measuring time from the same moment:
+**`config->operation.op_cond` / `config-https://attendo.1337.ma/>operation.op_lock`** — implements the **startup barrier**. Every coder thread and the watcher call `wait_coders` and block here until `start_coders` has spawned every thread, recorded the precise start timestamp, and broadcast the signal. This ensures all threads start measuring time from the same moment:
 
 ```c
 // All threads block (routine_utils1.c — wait_coders):
