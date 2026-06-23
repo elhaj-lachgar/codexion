@@ -22,7 +22,7 @@ int	main(int arc, char **arv)
 	config = set_config(arv + 1);
 	if (!config)
 	{
-		printf("fail allocated memory");
+		fprintf(stderr, "fail allocated memory");
 		return (1);
 	}
 	if (!init_config(config))

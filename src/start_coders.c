@@ -82,7 +82,7 @@ int	start_coders(t_config *config)
 	join_coders(config, coders_created);
 	if (coders_created != config->number_coders + 1)
 	{
-		printf("fail to create all coders\n");
+		fprintf(stderr, "fail to create all coders\n");
 		free_handler(config, 1);
 		free(config);
 		return (0);

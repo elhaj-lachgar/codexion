@@ -112,14 +112,14 @@ int	init_config(t_config *config)
 		return (0);
 	if (!init_dongles(config))
 	{
-		printf("fail to init dongles\n");
+		fprintf(stderr, "fail to init dongles\n");
 		free_handler(config, 0);
 		free(config);
 		return (0);
 	}
 	if (!init_coders(config))
 	{
-		printf("fail to init coders\n");
+		fprintf(stderr, "fail to init coders\n");
 		free_handler(config, 0);
 		free(config);
 		return (0);

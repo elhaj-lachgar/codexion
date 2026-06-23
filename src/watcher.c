@@ -12,7 +12,7 @@
 
 #include "codexion.h"
 
-void	wake_up_all(t_config *config)
+static void	wake_up_all(t_config *config)
 {
 	int	i;
 

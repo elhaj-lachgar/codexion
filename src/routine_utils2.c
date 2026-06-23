@@ -25,6 +25,4 @@ void	release_dongle(t_dongle *dongle, t_config *config)
 	dongle->is_taken = 0;
 	dongle->available_at = get_time_ms() + config->dongle_cooldown;
 	pthread_mutex_unlock(&dongle->locker_d);
-	if (!config->dongle_cooldown)
-		wake_up_all(config);
 }

@@ -21,11 +21,11 @@ static int	is_error(int *error)
 static void	error_logs(int *err_digit, int *err_overflow)
 {
 	if (*err_digit)
-		printf("The Arguments must be integer\n");
+		fprintf(stderr, "The Arguments must be integer\n");
 	else if (*err_overflow)
-		printf("The Arguments overflow\n");
+		fprintf(stderr, "The Arguments overflow\n");
 	else
-		printf("The Argument is Negative Value\n");
+		fprintf(stderr, "The Argument is Negative Value\n");
 }
 
 long	ft_atoi(char *nbr, int *not_digit, int *overflow)
@@ -64,7 +64,7 @@ static int	is_shuld(char *pos)
 		return (1);
 	if (!strcmp(pos, "edf"))
 		return (1);
-	printf("scheduler Must equal fifo or edf\n");
+	fprintf(stderr, "scheduler Must equal fifo or edf\n");
 	return (0);
 }
 

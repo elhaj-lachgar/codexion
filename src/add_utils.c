@@ -42,7 +42,7 @@ int	add_validator(int arc)
 {
 	if (arc != 8)
 	{
-		printf("ERROR: lenght of arguments must be 8\n");
+		fprintf(stderr, "ERROR: lenght of arguments must be 8\n");
 		return (0);
 	}
 	return (1);
@@ -55,9 +55,9 @@ int	add_validator1(int index, int value)
 	if (value == 0)
 	{
 		if (index == 0)
-			printf("number of coders must be bigger 0\n");
+			fprintf(stderr, "number of coders must be bigger 0\n");
 		if (index == 5)
-			printf("compile required must be bigger 0\n");
+			fprintf(stderr, "compile required must be bigger 0\n");
 		return (0);
 	}
 	return (1);
